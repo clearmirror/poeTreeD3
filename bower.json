@@ -1,0 +1,25 @@
+{
+  "name": "poeTreeD3",
+  "version": "0.0.0",
+  "authors": [
+    "ychen"
+  ],
+  "description": "POE passive tree using d3",
+  "keywords": [
+    "POE",
+    "D3"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "d3": "~3.5.10",
+    "requirejs": "~2.1.22",
+    "jquery": "~2.1.4"
+  }
+}
