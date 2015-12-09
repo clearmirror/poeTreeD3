@@ -1,4 +1,10 @@
-define(['d3', 'jquery', 'd3tree/constants', 'd3tree/imgPattern'], function (d3, $, cst, ip) {
+define([
+  'd3',
+  'jquery',
+  'constants',
+  'd3tree/imgPattern',
+  'd3tree/assets',
+  'd3tree/nodeType'], function (d3, $, cst, ip, asset, nodeTypes) {
   'use strict';
 
   function beingZoomed() {
@@ -32,6 +38,7 @@ define(['d3', 'jquery', 'd3tree/constants', 'd3tree/imgPattern'], function (d3, 
           return;
         }
         self.json = json;
+        asset.fromJson(json);
 
         self.groups = json.groups;
         self.groupArray = [];
@@ -70,18 +77,14 @@ define(['d3', 'jquery', 'd3tree/constants', 'd3tree/imgPattern'], function (d3, 
 
       this.container = zoomG.append("g");
 
-      this.id2g = {};
-      var groups = this.container.selectAll(".group")
+      // add groups
+      this.container.append("g").selectAll(".group")
         .data(this.groupArray, function (d) {
           return d.id;
         })
         .enter()
-        .append("g")
-        .each(function (d) {
-          self.id2g[d.id] = this;
-        });
-
-      groups.append("circle")
+        .append("circle")
+        .attr("class", "group")
         .attr("cx", function (d) {
           return d.x;
         })
@@ -92,30 +95,67 @@ define(['d3', 'jquery', 'd3tree/constants', 'd3tree/imgPattern'], function (d3, 
         .attr("fill", "#00b8e6");
 
       // add all pattern
+      var id2size = {};
       this.nodeArray.forEach(function(d){
         var icon = d.icon;
-        if (isBasicNode(d)) {
-          var spec = self.json["skillSprites"]["normalInactive"][3]['coords'][icon];
-          ip.addPattern(getId(icon), cst.images.skill_sprite.inactive, spec);
+        var imgData, fileName, spec, size;
+
+        switch(nodeTypes.getType(d)){
+          case nodeTypes.types.normal:
+            imgData = asset.nodeImg.normal;
+            break;
+          case nodeTypes.types.notable:
+            imgData = asset.nodeImg.notable;
+            break;
+          case nodeTypes.types.keystone:
+            imgData = asset.nodeImg.keyStone;
+            break;
+          case nodeTypes.types.mastery:
+            imgData = asset.nodeImg.mastery;
+            break;
         }
+
+        fileName = imgData.filename;
+        spec = imgData.coords[icon];
+        size = cst.imageSize[fileName];
+        var id = getId(icon);
+        id2size[id] = spec;
+        if(spec)
+          ip.addPattern(id, cst.assetsPath + fileName, spec, size);
       });
 
+      var test = this.nodeArray.filter(function(d){
+        return nodeTypes.getType(d) === nodeTypes.types.mastery;
+      });
       this.container.selectAll(".skillNode")
-        .data(this.nodeArray, function (d) {
-          return d.id;
-        })
+        //.data(this.nodeArray, function (d) {
+        //  return d.id;
+        //})
+        .data(test)
         .enter()
         .append("circle")
         .attr("class", "skillNode")
         .attr("cx", computeNodeX)
         .attr("cy",computeNodeY)
-        .attr("r", 27/2)
+        .attr("r", getRadius)
         .style("fill", function (d) {
           return "url(#" + getId(d.icon) + ")";
         });
-
     }
   };
+
+  function getRadius(node){
+    switch(nodeTypes.getType(node)){
+      case nodeTypes.types.normal:
+        return cst.nodeSize.normal/2;
+      case nodeTypes.types.notable:
+        return cst.nodeSize.notable/2;
+      case nodeTypes.types.keystone:
+        return cst.nodeSize.keystone/2;
+      case nodeTypes.types.mastery:
+        return cst.nodeSize.mastery/2;
+    }
+  }
 
   function getId(str){
     return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "");
