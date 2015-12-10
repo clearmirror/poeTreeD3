@@ -54,6 +54,9 @@ define([
           self.nodes[d.id] = d;
           // link to group
           d.group = self.groups[d.g];
+          // group radius
+          if(!d.group.radius || d.group.radius < cst.orbitRadi[d.o])
+            d.group.radius = cst.orbitRadi[d.o];
           // calculate arc
           d.arc = 2 * Math.PI * d.oidx / cst.skillsPerOrbit[d.o] - 0.5 * Math.PI;
         });
@@ -63,7 +66,7 @@ define([
 
     draw: function (w, h) {
       var self = this;
-      var svg = d3.select("body").append("svg").attr("width", w).attr("height", h);
+      var svg = d3.select("body").select("svg").attr("width", w).attr("height", h);
       ip.init(svg);
 
       var zoomG = svg.append("g").call(this.zoom).on("dblclick.zoom", null);
@@ -77,23 +80,7 @@ define([
 
       this.container = zoomG.append("g");
 
-      // add groups
-      this.container.append("g").selectAll(".group")
-        .data(this.groupArray, function (d) {
-          return d.id;
-        })
-        .enter()
-        .append("circle")
-        .attr("class", "group")
-        .attr("cx", function (d) {
-          return d.x;
-        })
-        .attr("cy", function (d) {
-          return d.y;
-        })
-        .attr("r", 10)
-        .attr("fill", "#00b8e6");
-
+      drawMasteries.call(this);
       // add all pattern
       var id2size = {};
       this.nodeArray.forEach(function(d){
@@ -124,25 +111,49 @@ define([
           ip.addPattern(id, cst.assetsPath + fileName, spec, size);
       });
 
-      var test = this.nodeArray.filter(function(d){
-        return nodeTypes.getType(d) === nodeTypes.types.mastery;
-      });
-      this.container.selectAll(".skillNode")
-        //.data(this.nodeArray, function (d) {
-        //  return d.id;
-        //})
-        .data(test)
-        .enter()
-        .append("circle")
-        .attr("class", "skillNode")
-        .attr("cx", computeNodeX)
-        .attr("cy",computeNodeY)
-        .attr("r", getRadius)
-        .style("fill", function (d) {
-          return "url(#" + getId(d.icon) + ")";
-        });
+      drawNodes.call(this);
     }
   };
+
+  function drawMasteries(){
+    // add groups
+    this.container.append("g").selectAll(".group")
+      .data(this.groupArray, function (d) {
+        return d.id;
+      })
+      .enter()
+      .append("circle")
+      .attr("class", "group")
+      .attr("cx", function (d) {
+        return d.x;
+      })
+      .attr("cy", function (d) {
+        return d.y;
+      })
+      .attr("r", function(d){
+        return d.radius;
+      })
+      .attr("fill", "#00b8e6")
+      .attr("opacity", 0.5);
+  }
+
+  function drawNodes(){
+    this.container.selectAll(".skillNode")
+      .data(this.nodeArray, function (d) {
+        return d.id;
+      })
+      .enter()
+      .append("circle")
+      .attr("class", "skillNode")
+      .attr("cx", computeNodeX)
+      .attr("cy",computeNodeY)
+      .attr("r", getRadius)
+      .attr("stroke", "black")
+      .attr("stroke-width", "3px")
+      .attr("fill", function (d) {
+        return "url(#" + getId(d.icon) + ")";
+      });
+  }
 
   function getRadius(node){
     switch(nodeTypes.getType(node)){

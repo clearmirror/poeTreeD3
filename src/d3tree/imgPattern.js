@@ -7,7 +7,7 @@ define(['d3'], function (d3) {
   var img2size = {};
 
   exports.init = function(svg){
-    this.def = svg.append("svg:defs");
+    this.def = svg.select("defs");
   };
 
   exports.addPattern = function(id, url, spec, size){
@@ -17,8 +17,8 @@ define(['d3'], function (d3) {
         .attr("id", id)
         .attr("x", 0)
         .attr("y", 0)
-        .attr("width", spec.w)
-        .attr("height", spec.h)
+        .attr("width", 1)
+        .attr("height", 1)
         .attr("patternUnits", "objectBoundingBox");
 
       p.append("image")
