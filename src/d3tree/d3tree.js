@@ -4,7 +4,10 @@ define([
   'constants',
   'd3tree/imgPattern',
   'd3tree/assets',
-  'd3tree/nodeType'], function (d3, $, cst, ip, asset, nodeTypes) {
+  'd3tree/nodeType',
+  'd3tree/util',
+  'tooltip'
+], function (d3, $, cst, ip, asset, nodeTypes, util, tooltip) {
   'use strict';
 
   if (!String.prototype.format) {
@@ -37,7 +40,7 @@ define([
 
     // d3 behavior
     this.zoom = d3.behavior.zoom()
-      .scaleExtent([0.1, 2])
+      .scaleExtent([0.2, 5])
       .on("zoom", beingZoomed.bind(this));
   };
 
@@ -70,7 +73,7 @@ define([
           if(!d.group.radius || d.group.radius < cst.orbitRadi[d.o])
             d.group.radius = cst.orbitRadi[d.o];
           // calculate arc
-          d.arc = 2 * Math.PI * d.oidx / cst.skillsPerOrbit[d.o] - 0.5 * Math.PI;
+          d.arc = util.getArc(d);
           d.x = computeNodeX(d);
           d.y = computeNodeY(d);
         });
@@ -81,7 +84,9 @@ define([
     draw: function (w, h) {
       var self = this;
       var svg = d3.select("body").select("svg").attr("width", w).attr("height", h);
+      // init stuff
       ip.init(svg);
+      tooltip.init("body");
 
       var zoomG = svg.append("g").call(this.zoom).on("dblclick.zoom", null);
 
@@ -154,24 +159,16 @@ define([
     }
   }
 
-  function isCcw(ang) {
-    while (ang <= -Math.PI) ang += Math.PI * 2;
-    while (ang > Math.PI) ang -= Math.PI * 2;
-    return ang < 0;
-  }
-
   function drawPath(node1, node2){
-
-    var clockWise;
-    if(isCcw(node2.arc - node1.arc))
-      clockWise = 0;
-    else
-      clockWise = 1;
     if(node1.g === node2.g && node1.o === node2.o){
     //<path d="M 0 0
     //  A 50 50, 0, 0, 0, 50 50
     //  " stroke="red" fill="none"/>
-      return "M {0} {1} A {2} {2}, 0, 0, {5}, {3} {4}".format(node1.x, node1.y, cst.orbitRadi[node1.o], node2.x, node2.y, clockWise);
+      if(node1.arc > node2.arc && node1.arc - node2.arc <= Math.PI ||
+        node1.arc - node2.arc < -Math.PI)
+        return "M {0} {1} A {2} {2}, 0, 0, 0, {3} {4}".format(node1.x, node1.y, cst.orbitRadi[node1.o], node2.x, node2.y);
+      else
+        return "M {0} {1} A {2} {2}, 0, 0, 0, {3} {4}".format(node2.x, node2.y, cst.orbitRadi[node1.o], node1.x, node1.y);
     }
     else{
       return "M {0} {1} L {2} {3}".format(node1.x, node1.y, node2.x, node2.y);
@@ -215,7 +212,14 @@ define([
       .attr("stroke-width", "3px")
       .attr("fill", function (d) {
         return "url(#" + getId(d.icon) + ")";
+      })
+      .on("mouseover", function(d){
+        tooltip.setHtml(util.node2html(d)).setPosition([d3.event.clientX, d3.event.clientY]).show();
+      })
+      .on("mouseout", function () {
+        tooltip.hide();
       });
+
   }
 
   function getRadius(node){
@@ -237,12 +241,12 @@ define([
 
   function computeNodeX(d) {
     var r = cst.orbitRadi[d.o];
-    return d.group.x + r * Math.cos(d.arc);
+    return d.group.x - r * Math.sin(-d.arc);
   }
 
   function computeNodeY(d) {
     var r = cst.orbitRadi[d.o];
-    return d.group.y + r * Math.sin(d.arc);
+    return d.group.y - r * Math.cos(-d.arc);
   }
 
   return D3Tree;
