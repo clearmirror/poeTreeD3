@@ -1,4 +1,4 @@
-define(['d3'], function (d3) {
+define(['d3', 'constants'], function (d3, cst) {
   'use strict';
   var exports = {};
   // flagging ids that have been added
@@ -27,7 +27,7 @@ define(['d3'], function (d3) {
         .attr("width", size.width)
         .attr("height", size.height)
         .attr("transform", function () {
-          return "translate(" + (-1) * spec.x + ',' + (-1) * spec.y + ")";
+          return "scale({0})translate({1},{2})".format(cst.scale, -1*spec.x, -1*spec.y); // + (-1) * spec.x + ',' + (-1) * spec.y + ")";
         })
         .attr("xlink:href", url);
       ids[id] = true;

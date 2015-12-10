@@ -1,11 +1,12 @@
 define([], function () {
   'use strict';
   var assetsPath = 'resource/assets/';
-  var s = 1;
+
   return {
+    scale : 2,
     assetsPath : assetsPath,
     skillsPerOrbit: [1, 6, 12, 12, 40],
-    orbitRadi: [0, 81.5*s, 163*s, 326*s, 489*s],
+    orbitRadi: [0, 81.5, 163, 326, 489],
     genImgUrl : "https://p7p4m6s5.ssl.hwcdn.net",
     images: {
       skill_sprite : {

@@ -9,19 +9,6 @@ define([
   'tooltip'
 ], function (d3, $, cst, ip, asset, nodeTypes, util, tooltip) {
   'use strict';
-
-  if (!String.prototype.format) {
-    String.prototype.format = function() {
-      var args = arguments;
-      return this.replace(/{(\d+)}/g, function(match, number) {
-        return typeof args[number] != 'undefined'
-          ? args[number]
-          : match
-          ;
-      });
-    };
-  }
-
   function beingZoomed() {
     this.container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
   }
@@ -207,14 +194,17 @@ define([
       .attr("class", "skillNode")
       .attr("cx", computeNodeX)
       .attr("cy",computeNodeY)
-      .attr("r", getRadius)
+      .attr("r", function(d){
+        return getRadius(d)*cst.scale;
+        //getRadius)
+      })
       .attr("stroke", "black")
       .attr("stroke-width", "3px")
       .attr("fill", function (d) {
         return "url(#" + getId(d.icon) + ")";
       })
       .on("mouseover", function(d){
-        tooltip.setHtml(util.node2html(d)).setPosition([d3.event.clientX, d3.event.clientY]).show();
+        tooltip.setHtml(util.node2html(d)).setPosition([d3.event.clientX + 20, d3.event.clientY + 20]).show();
       })
       .on("mouseout", function () {
         tooltip.hide();

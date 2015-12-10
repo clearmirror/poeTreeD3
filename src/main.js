@@ -1,5 +1,25 @@
 define(['d3tree/d3tree'], function(D3Tree){
-  var t = new D3Tree();
-  t.loadTreeJson();
-  //t.draw();
+
+  init();
+  runApp();
+
+
+  function runApp(){
+    var t = new D3Tree();
+    t.loadTreeJson();
+  }
+
+  function init(){
+    if (!String.prototype.format) {
+      String.prototype.format = function() {
+        var args = arguments;
+        return this.replace(/{(\d+)}/g, function(match, number) {
+          return typeof args[number] != 'undefined'
+            ? args[number]
+            : match
+            ;
+        });
+      };
+    }
+  }
 });
