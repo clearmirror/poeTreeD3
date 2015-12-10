@@ -7,6 +7,18 @@ define([
   'd3tree/nodeType'], function (d3, $, cst, ip, asset, nodeTypes) {
   'use strict';
 
+  if (!String.prototype.format) {
+    String.prototype.format = function() {
+      var args = arguments;
+      return this.replace(/{(\d+)}/g, function(match, number) {
+        return typeof args[number] != 'undefined'
+          ? args[number]
+          : match
+          ;
+      });
+    };
+  }
+
   function beingZoomed() {
     this.container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
   }
@@ -59,6 +71,8 @@ define([
             d.group.radius = cst.orbitRadi[d.o];
           // calculate arc
           d.arc = 2 * Math.PI * d.oidx / cst.skillsPerOrbit[d.o] - 0.5 * Math.PI;
+          d.x = computeNodeX(d);
+          d.y = computeNodeY(d);
         });
         self.draw(window.innerWidth, window.innerHeight);
       })
@@ -111,9 +125,58 @@ define([
           ip.addPattern(id, cst.assetsPath + fileName, spec, size);
       });
 
+      drawPaths.call(this);
       drawNodes.call(this);
+
     }
   };
+
+  function drawPaths(){
+    var roots = this.json["root"];
+    var q = roots.out.map(function(d){return d});
+    var pathGroup = this.container.append("g").attr("class", "pathGroup");
+    var self = this;
+    var visited = {};
+    for(var i=0; i<this.nodeArray.length; i++){
+      var currentNode = this.nodeArray[i];
+      if(visited[currentNode.id])
+        continue;
+      visited[currentNode.id] = true;
+      var nexts = currentNode.out;
+
+      nexts.forEach(function(nextId){
+        var nextNode = self.nodes[nextId];
+        pathGroup.append("path").attr("d", drawPath(currentNode, nextNode))
+          .attr("stroke", "black").attr("stroke-width", 5)
+          .attr("fill", "none");
+        q.push(nextId);
+      })
+    }
+  }
+
+  function isCcw(ang) {
+    while (ang <= -Math.PI) ang += Math.PI * 2;
+    while (ang > Math.PI) ang -= Math.PI * 2;
+    return ang < 0;
+  }
+
+  function drawPath(node1, node2){
+
+    var clockWise;
+    if(isCcw(node2.arc - node1.arc))
+      clockWise = 0;
+    else
+      clockWise = 1;
+    if(node1.g === node2.g && node1.o === node2.o){
+    //<path d="M 0 0
+    //  A 50 50, 0, 0, 0, 50 50
+    //  " stroke="red" fill="none"/>
+      return "M {0} {1} A {2} {2}, 0, 0, {5}, {3} {4}".format(node1.x, node1.y, cst.orbitRadi[node1.o], node2.x, node2.y, clockWise);
+    }
+    else{
+      return "M {0} {1} L {2} {3}".format(node1.x, node1.y, node2.x, node2.y);
+    }
+  }
 
   function drawMasteries(){
     // add groups
@@ -170,10 +233,6 @@ define([
 
   function getId(str){
     return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "");
-  }
-
-  function isBasicNode(node) {
-    return !node.ks && !node.m && !node.not;
   }
 
   function computeNodeX(d) {
