@@ -1,21 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <link rel="stylesheet" type="text/css" href="css/global.css">
+  <meta charset="utf-8">
+  <link rel="stylesheet" type="text/css" href="css/global.css">
 </head>
 <body>
-    <svg>
-        <defs>
-            <!--<pattern id="image" x="0" y="0" patternUnits="userSpaceOnUse" height="99" width="99">-->
-                <!--<image x="0" y="0" width="693" height="594" transform="translate(-594, -396)" xlink:href="resource/assets/skill_sprite-active-3-9938ab61c22ff80e42358ba3b40e0f4f.png"></image>-->
-            <!--</pattern>-->
-            <!--<pattern id="Art2DArtSkillIconspassivesMasteryGroupSwordpng" x="0" y="0" width="99" height="99"-->
-                     <!--patternUnits="objectBoundingBox"><image x="0" y="0" width="693" height="594" transform="translate(-99,0)" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="resource/assets/skill_sprite-active-3-9938ab61c22ff80e42358ba3b40e0f4f.png"></image></pattern>-->
-        </defs>
-
-        <!--<circle id='top' cx="49.5" cy="49.5" r="49.5" fill="url(#Art2DArtSkillIconspassivesMasteryGroupSwordpng)"/>-->
-    </svg>
+<svg>
+  <defs>
+    <pattern id="keyStoneFrame" x="0" y="0" patternUnits="objectBoundingBox" height="1" width="1">
+      <image x="0" y="0" width="84" height="85" transform="scale(1.5)" xlink:href="resource/assets/KeystoneFrameUnallocated.png"></image>
+    </pattern>
+    <pattern id="notableFrame" x="0" y="0" patternUnits="objectBoundingBox" height="1" width="1">
+      <image x="0" y="0" width="58" height="59" transform="scale(1.5)" xlink:href="resource/assets/NotableFrameUnallocated.png"></image>
+    </pattern>
+    <pattern id="normalFrame" x="0" y="0" patternUnits="objectBoundingBox" height="1" width="1">
+      <image x="0" y="0" width="40" height="40" transform="scale(1.5)" xlink:href="resource/assets/PSSkillFrame.png"></image>
+    </pattern>
+    <pattern id="jewelFrame" x="0" y="0" patternUnits="objectBoundingBox" height="1" width="1">
+      <image x="0" y="0" width="58" height="59" transform="scale(1.5)" xlink:href="resource/assets/JewelFrameUnallocated.png"></image>
+    </pattern>
+    <!--predefined brightness filter-->
+    <filter id="dim">
+      <feComponentTransfer>
+        <feFuncR type="linear" slope="0.3"/>
+        <feFuncG type="linear" slope="0.3"/>
+        <feFuncB type="linear" slope="0.3"/>
+      </feComponentTransfer>
+    </filter>
+    <filter id="light">
+      <feComponentTransfer>
+        <feFuncR type="linear" slope="1.5"/>
+        <feFuncG type="linear" slope="1.5"/>
+        <feFuncB type="linear" slope="1.5"/>
+      </feComponentTransfer>
+    </filter>
+  </defs>
+</svg>
 </body>
 <script data-main="src/requireConfig" src="bower_components/requirejs/require.js"></script>
 </html>

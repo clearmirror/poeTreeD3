@@ -3,6 +3,7 @@ html, body {
     padding: 0;
     height: 100%;
     overflow: hidden;
+    background-color: #808080;
 }
 
 ul {
@@ -13,6 +14,14 @@ ul {
 svg{
     width : 100%;
     height : 100%;
+}
+
+g.skillNode.selected {
+    filter : url(#light);
+}
+
+g.skillNode {
+    filter : url(#dim);
 }
 
 .tooltip{

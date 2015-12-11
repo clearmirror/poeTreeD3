@@ -100,6 +100,9 @@ define([
           case nodeTypes.types.notable:
             imgData = asset.nodeImg.notable;
             break;
+          case nodeTypes.types.jewel:
+            imgData = asset.nodeImg.notable;
+            break;
           case nodeTypes.types.keystone:
             imgData = asset.nodeImg.keyStone;
             break;
@@ -139,7 +142,7 @@ define([
       nexts.forEach(function(nextId){
         var nextNode = self.nodes[nextId];
         pathGroup.append("path").attr("d", drawPath(currentNode, nextNode))
-          .attr("stroke", "black").attr("stroke-width", 5)
+          .attr("stroke", "#4d6600").attr("stroke-width", 5)
           .attr("fill", "none");
         q.push(nextId);
       })
@@ -180,28 +183,24 @@ define([
       .attr("r", function(d){
         return d.radius;
       })
-      .attr("fill", "#00b8e6")
+      .attr("fill", "none")
       .attr("opacity", 0.5);
   }
 
   function drawNodes(){
-    this.container.selectAll(".skillNode")
+    var g = this.container
+      .selectAll(".skillNode")
       .data(this.nodeArray, function (d) {
         return d.id;
       })
       .enter()
-      .append("circle")
+      .append("g")
       .attr("class", "skillNode")
-      .attr("cx", computeNodeX)
-      .attr("cy",computeNodeY)
-      .attr("r", function(d){
-        return getRadius(d)*cst.scale;
-        //getRadius)
+      .attr("transform", function(d){
+        return "translate({0}, {1})".format(d.x, d.y);
       })
-      .attr("stroke", "black")
-      .attr("stroke-width", "3px")
-      .attr("fill", function (d) {
-        return "url(#" + getId(d.icon) + ")";
+      .on("click", function(){
+        d3.select(this).classed("selected", true);
       })
       .on("mouseover", function(d){
         tooltip.setHtml(util.node2html(d)).setPosition([d3.event.clientX + 20, d3.event.clientY + 20]).show();
@@ -210,18 +209,47 @@ define([
         tooltip.hide();
       });
 
+    // draw passive node
+    g.append("circle")
+      .attr("r", function(d){
+        return getRadius(d)*cst.scale;
+      })
+      .attr("fill", function (d) {
+        return "url(#" + getId(d.icon) + ")";
+      });
+
+    // draw frame
+    g.append("circle")
+      .attr("class", "skillNodeFrame")
+      .attr("r", function(d){
+        return getRadius(d, 'frame')*cst.scale;
+      })
+      .attr("fill", function(d){
+        switch(nodeTypes.getType(d)){
+          case nodeTypes.types.normal: return "url(#normalFrame)";
+          case nodeTypes.types.keystone : return "url(#keyStoneFrame)";
+          case nodeTypes.types.notable : return "url(#notableFrame)";
+          case nodeTypes.types.jewel : return "url(#jewelFrame)";
+          default: return "none";
+        }
+      });
   }
 
-  function getRadius(node){
+  function getRadius(node, type){
+    var sizes = cst.nodeSize;
+    if(type === 'frame')
+      sizes = cst.frameSize;
     switch(nodeTypes.getType(node)){
       case nodeTypes.types.normal:
-        return cst.nodeSize.normal/2;
+        return sizes.normal/2;
       case nodeTypes.types.notable:
-        return cst.nodeSize.notable/2;
+        return sizes.notable/2;
       case nodeTypes.types.keystone:
-        return cst.nodeSize.keystone/2;
+        return sizes.keystone/2;
       case nodeTypes.types.mastery:
-        return cst.nodeSize.mastery/2;
+        return sizes.mastery/2;
+      case nodeTypes.types.jewel:
+        return sizes.jewel/2;
     }
   }
 

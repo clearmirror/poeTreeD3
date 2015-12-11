@@ -5,7 +5,8 @@ define([], function(){
     normal : 0,
     notable : 1,
     keystone : 2,
-    mastery : 3
+    mastery : 3,
+    jewel : 4
   };
 
   exports.types = types;
@@ -16,6 +17,8 @@ define([], function(){
       return types.mastery;
     if(node.not)
       return types.notable;
+    if(node.dn === "Jewel Socket")
+      return types.jewel;
     return types.normal;
   };
 

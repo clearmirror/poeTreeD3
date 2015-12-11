@@ -27,7 +27,7 @@ define(['d3', 'constants'], function (d3, cst) {
         .attr("width", size.width)
         .attr("height", size.height)
         .attr("transform", function () {
-          return "scale({0})translate({1},{2})".format(cst.scale, -1*spec.x, -1*spec.y); // + (-1) * spec.x + ',' + (-1) * spec.y + ")";
+          return "scale({0})translate({1},{2})".format(cst.scale, -1*spec.x, -1*spec.y);
         })
         .attr("xlink:href", url);
       ids[id] = true;

@@ -3,7 +3,7 @@ define([], function () {
   var assetsPath = 'resource/assets/';
 
   return {
-    scale : 2,
+    scale : 1.5,
     assetsPath : assetsPath,
     skillsPerOrbit: [1, 6, 12, 12, 40],
     orbitRadi: [0, 81.5, 163, 326, 489],
@@ -29,7 +29,15 @@ define([], function () {
       normal : 27,
       notable : 38,
       keystone : 54,
-      mastery : 99
+      mastery : 99,
+      jewel : 58
+    },
+    frameSize : {
+      normal : 40,
+      notable : 58,
+      keystone : 84,
+      mastery : 0,
+      jewel : 58
     }
   }
 });
